@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 public class Banco {
     private String nombreBanco;
     private String direccionBanco;
-    private ArrayList<Cuenta_bancaria> listaCuentas;
+    private ArrayList<Cuenta_banco> listaCuentas;
 
     public Banco() { 
     }
@@ -40,11 +40,11 @@ public class Banco {
         this.direccionBanco = dereccionBanco;
     }
 
-    public ArrayList<Cuenta_bancaria> getListaCuentas() {
+    public ArrayList<Cuenta_banco> getListaCuentas() {
         return listaCuentas;
     }
 
-    public void setListaCuentas(ArrayList<Cuenta_bancaria> listaCuentas) {
+    public void setListaCuentas(ArrayList<Cuenta_banco> listaCuentas) {
         this.listaCuentas = listaCuentas;
     }
     
@@ -58,14 +58,14 @@ public class Banco {
      * @return
      * @throws Exception 
      */
-    public String crearCuenta(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) throws Exception {
+    private  String crearCuenta(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) throws Exception {
         
         String salida= "Cuenta creada con exito";
         boolean cuentaEncontrada= verificarCuenta(num_cuenta);
         if(cuentaEncontrada){
             throw new Exception("La cuenta ya existe");
         }else{
-            Cuenta_bancaria nuevaCuenta= new Cuenta_bancaria(nombres,apellidos,num_cuenta,tipo_cuenta,salario_cuenta);
+            Cuenta_banco nuevaCuenta= new Cuenta_banco(nombres,apellidos,num_cuenta,tipo_cuenta,salario_cuenta);
             listaCuentas.add(nuevaCuenta);
         }
         return salida;
@@ -77,8 +77,8 @@ public class Banco {
      */
     private boolean verificarCuenta(String num_cuenta){
         boolean encontrado= false;
-        for (Cuenta_bancaria cuenta : listaCuentas) {
-            if(cuenta.getNum_cuenta().equals(num_cuenta)){
+        for (Cuenta_banco cuenta : listaCuentas) {
+            if(cuenta.verificarNumCuenta(num_cuenta)){
                 encontrado= true;
                 return encontrado;
             }
@@ -176,16 +176,16 @@ public class Banco {
         
     }
     /**
-     * 
+     * Primero se revisa el que la lista de cuentas no este vacia, despues se recorre  la lista para encontrar la cuenta y mostrar la informacion
      * @param num_Cuenta 
+     * 
      */
     private void consultarCuenta(String num_Cuenta) {
         String salida= "";
         if(!listaCuentas.isEmpty()){
             for (int i = 0; i < listaCuentas.size(); i++) {
-                if(listaCuentas.get(i).getNum_cuenta().equals(num_Cuenta)){
-                    salida+="Nombre: " +listaCuentas.get(i).getNombres() + " "+listaCuentas.get(i).getApellidos()+ "\n Numero de cuenta: "+listaCuentas.get(i).getNum_cuenta()+
-                            "\n Tipo de cuenta "+listaCuentas.get(i).getTipo_cuenta()+ "\n Saldo de la cuenta "+listaCuentas.get(i).getSalario_cuenta();
+                if(listaCuentas.get(i).verificarNumCuenta(num_Cuenta)){
+                    salida+= listaCuentas.get(i).toString();
                 }
             }
           
@@ -207,11 +207,11 @@ public class Banco {
             String exit = "";
             if(verificarCuenta(numcuenta)==true){
                 for (int i = 0; i < listaCuentas.size(); i++) {
-                    if(listaCuentas.get(i).getNum_cuenta().equals(numcuenta)){
+                    if(listaCuentas.get(i).verificarNumCuenta(numcuenta)){
                         saldoCuenta = listaCuentas.get(i).getSalario_cuenta();
                         saldoCuenta = saldoCuenta + saldoConsignar;
                         listaCuentas.get(i).setSalario_cuenta(saldoCuenta);
-                        exit = "Valor consignado con éxito" + "\n" +"Saldo actual: " +saldoCuenta;
+                        exit = "Valor consignado con éxito" +"\nSaldo actual: " +saldoCuenta;
                     }
                 }
             }
@@ -226,11 +226,11 @@ public class Banco {
     public boolean retirarSaldo(String numcuenta, double saldoRetirar){
         double saldoCuenta = 0;
         boolean exit= true;
-        if(verificarCuenta(numcuenta)==true){
+        if(verificarCuenta(numcuenta)){
             for (int i = 0; i < listaCuentas.size(); i++) {
-                if(listaCuentas.get(i).getNum_cuenta().equals(numcuenta)){
+                if(listaCuentas.get(i).verificarNumCuenta(numcuenta)){
                     saldoCuenta = listaCuentas.get(i).getSalario_cuenta();
-                    if(saldoCuenta<saldoRetirar){
+                    if(listaCuentas.get(i).verficarSaldo(saldoRetirar)){
                         exit = false;
                     }
                     else{ 
@@ -256,19 +256,21 @@ public class Banco {
     public void tranferirSueldo(String numCuentaInicio, String numCuentaDestino, double valorTransfer) {        
         double saldoCuentaOrigen= 0, nuevoSaldoCuentaOrigen=0;
         double saldoActualCuentaDestino=0, nuevoSaldoCuentaDestino= 0;
+        
         if(verificarCuenta(numCuentaInicio) && verificarCuenta(numCuentaDestino)){
             if(numCuentaInicio.equals(numCuentaDestino)){
                 JOptionPane.showMessageDialog(null, "La cuenta de destino no puede ser la misma de origen");
             }else{
                 if(retirarSaldo(numCuentaInicio,valorTransfer)){
+                    //Se recibe el boolean de la funcion returar saldo, para saber si tiene el saldo disponible
                     for (int i = 0; i < listaCuentas.size(); i++) {
-                        if(listaCuentas.get(i).getNum_cuenta().equals(numCuentaDestino)){
+                        if(listaCuentas.get(i).verificarNumCuenta(numCuentaDestino)){
                             saldoActualCuentaDestino= listaCuentas.get(i).getSalario_cuenta();
                             nuevoSaldoCuentaDestino= saldoActualCuentaDestino+valorTransfer;
                             
                             listaCuentas.get(i).setSalario_cuenta(nuevoSaldoCuentaDestino);
                             JOptionPane.showMessageDialog(null,"Tranferencia exitosa, consulte su nuevo saldo en la opcion 2 del menu principal");
-                            if(listaCuentas.get(i).getNum_cuenta().equals(numCuentaInicio)){
+                            if(listaCuentas.get(i).verificarNumCuenta(numCuentaInicio)){
                                 saldoCuentaOrigen= listaCuentas.get(i).getSalario_cuenta();
                                 nuevoSaldoCuentaOrigen= saldoCuentaOrigen-valorTransfer;
                                 listaCuentas.get(i).setSalario_cuenta(nuevoSaldoCuentaOrigen);
@@ -300,10 +302,10 @@ public class Banco {
         
         if (verificarCuenta(cuenta1) && verificarCuenta(cuenta2)  ){
             for (int i = 0; i < listaCuentas.size(); i++) {
-                if(listaCuentas.get(i).getNum_cuenta().equals(cuenta1)){
+                if(listaCuentas.get(i).verificarNumCuenta(cuenta1)){
                     saldoCuenta1= listaCuentas.get(i).getSalario_cuenta();
                 }
-                if(listaCuentas.get(i).getNum_cuenta().equals(cuenta2)){
+                if(listaCuentas.get(i).verificarNumCuenta(cuenta2)){
                     saldoCuenta2= listaCuentas.get(i).getSalario_cuenta();
                 }
             }

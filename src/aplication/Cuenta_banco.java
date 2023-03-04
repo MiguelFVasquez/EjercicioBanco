@@ -2,17 +2,17 @@
 package aplication;
 
 
-public class Cuenta_bancaria {
+public class Cuenta_banco {
     private String nombres;
     private String apellidos;
     private String num_cuenta;
     private String tipo_cuenta;
     private double salario_cuenta;
 
-    public Cuenta_bancaria() {
+    public Cuenta_banco() {
     }
 
-    public Cuenta_bancaria(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) {
+    public Cuenta_banco(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.num_cuenta = num_cuenta;
@@ -62,9 +62,18 @@ public class Cuenta_bancaria {
 
     @Override
     public String toString() {
-        return "cuenta_bancaria{" + "nombres=" + nombres + ", apellidos=" + apellidos + ", num_cuenta=" + num_cuenta + ", tipo_cuenta=" + tipo_cuenta + ", salario_cuenta=" + salario_cuenta + '}';
+        return "Nombre: " + nombres + " " + apellidos + "\n Numero de cuenta: " + num_cuenta + "\n Tipo de cuenta: " + tipo_cuenta + "\n Saldo: " + salario_cuenta;
     }
     
+   public boolean verificarNumCuenta(String cuenta){
    
-    
+    return getNum_cuenta().equals(cuenta);
+   }
+   
+   
+   public boolean verficarSaldo(double saldoRetiro){
+    return getSalario_cuenta()<saldoRetiro;
+   }
+
+
 }
