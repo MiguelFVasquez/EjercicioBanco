@@ -155,8 +155,12 @@ public class Banco {
                 case 6: 
                     String cuenta1= Funciones.leerCadena("Ingrese el numero de una cuenta: ");
                     String cuenta2= Funciones.leerCadena("Ingrese el numero de otra cuenta: ");
-                    String saldoMayor= compararCuentas(cuenta1,cuenta2);
-                    JOptionPane.showMessageDialog(null, saldoMayor);
+                    boolean saldoMayor= compararCuentas(cuenta1,cuenta2);
+                    if(saldoMayor){
+                        JOptionPane.showMessageDialog(null, "La cuenta con mayor saldo es: "+ cuenta1);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "La cuenta con mayor saldo es: "+ cuenta2);
+                    }
                     break;
                 
                 case 7:
@@ -290,8 +294,8 @@ public class Banco {
      * @param cuenta2
      * @return 
      */
-    private String compararCuentas(String cuenta1, String cuenta2){
-        String salida= "";
+    private boolean compararCuentas(String cuenta1, String cuenta2){
+        boolean salida= false;
         double saldoCuenta1=0, saldoCuenta2=0;
         
         if (verificarCuenta(cuenta1) && verificarCuenta(cuenta2)  ){
@@ -305,19 +309,11 @@ public class Banco {
             }
             
             if(saldoCuenta1>saldoCuenta2){
-                salida= "La cuenta que tiene mayor saldo es: "+ cuenta1;
-            }else if(saldoCuenta2>saldoCuenta1){
-                salida= "La cuenta con mayor saldo es: " + cuenta2;
-            }else{
-                salida= "Los saldos son iguales";
+                salida= true;
             }
             
             
-        }else{
-            salida= "Una de las cuentas no existe";
         }
-        
-        
         
         return salida;
     }
