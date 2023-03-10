@@ -2,9 +2,7 @@
 package aplication;
 
 
-public class Cuenta_banco {
-    private String nombres;
-    private String apellidos;
+public class Cuenta_banco extends Cliente {
     private String num_cuenta;
     private String tipo_cuenta;
     private double salario_cuenta;
@@ -12,31 +10,28 @@ public class Cuenta_banco {
     public Cuenta_banco() {
     }
 
-    public Cuenta_banco(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) {
-        this.nombres = nombres;
-        this.apellidos = apellidos;
+    public Cuenta_banco(String num_cuenta, String tipo_cuenta, double salario_cuenta) {
         this.num_cuenta = num_cuenta;
         this.tipo_cuenta = tipo_cuenta;
         this.salario_cuenta = salario_cuenta;
     }
 
-    public String getNombres() {
-        return nombres;
+
+
+    public Cuenta_banco(String nombres, String apellidos, String num_cuenta, String tipo_cuenta,
+            double salario_cuenta) {
+        super(nombres, apellidos);
+        this.num_cuenta = num_cuenta;
+        this.tipo_cuenta = tipo_cuenta;
+        this.salario_cuenta = salario_cuenta;
     }
 
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
-    }
 
-    public String getApellidos() {
-        return apellidos;
-    }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-
-    public String getNum_cuenta() {
+    
+    
+    
+   public String getNum_cuenta() {
         return num_cuenta;
     }
 
@@ -60,20 +55,38 @@ public class Cuenta_banco {
         this.salario_cuenta = salario_cuenta;
     }
 
-    @Override
-    public String toString() {
-        return "Nombre: " + nombres + " " + apellidos + "\n Numero de cuenta: " + num_cuenta + "\n Tipo de cuenta: " + tipo_cuenta + "\n Saldo: " + salario_cuenta;
-    }
-    
-   public boolean verificarNumCuenta(String cuenta){
+    public boolean verificarNumCuenta(String cuenta){
    
     return getNum_cuenta().equals(cuenta);
    }
    
-   
-   public boolean verficarSaldo(double saldoRetiro){
-    return getSalario_cuenta()<saldoRetiro;
-   }
 
+    @Override
+    public String toString() {
+        
+        return super.toString() + "\nNumero de la cuenta: "+ num_cuenta+ "\nTipo de cuenta: "+ tipo_cuenta+ "\nSaldo de la cuenta: "+ salario_cuenta  ;
+    }
+
+    public boolean verficarSaldo(double saldoRetiro){
+    return getSalario_cuenta()<saldoRetiro;
+    }
+
+   public boolean retirar(String numCuenta, double saldoRetiro){
+        boolean retiroEfectivo= true;
+        
+
+
+
+
+        return retiroEfectivo;
+   } 
+
+   public boolean consignar( double saldoC){
+        
+        setSalario_cuenta(saldoC+getSalario_cuenta());
+
+        return true;
+
+   }
 
 }

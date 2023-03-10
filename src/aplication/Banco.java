@@ -2,13 +2,14 @@ package aplication;
 
 
 import java.util.ArrayList;
+
 import javax.swing.JOptionPane;
 
 public class Banco {
     private String nombreBanco;
     private String direccionBanco;
     private ArrayList<Cuenta_banco> listaCuentas;
-
+    
     public Banco() { 
     }
     /**
@@ -118,7 +119,7 @@ public class Banco {
                     } catch (Exception e) {
                         resultado= e.getMessage();
                     }
-                    System.out.println(resultado);
+                    JOptionPane.showMessageDialog(null, resultado);;
                     break;
                     
                 case 2:
@@ -202,18 +203,17 @@ public class Banco {
      * @param saldoConsignar
      * @return 
      */
-    public String consignarSaldo(String numcuenta, double saldoConsignar){
-            double saldoCuenta = 0;
+    private String consignarSaldo(String numcuenta, double saldoConsignar){
+            Cuenta_banco cuenta  = new Cuenta_banco();
+            
             String exit = "";
-            if(verificarCuenta(numcuenta)==true){
-                for (int i = 0; i < listaCuentas.size(); i++) {
-                    if(listaCuentas.get(i).verificarNumCuenta(numcuenta)){
-                        saldoCuenta = listaCuentas.get(i).getSalario_cuenta();
-                        saldoCuenta = saldoCuenta + saldoConsignar;
-                        listaCuentas.get(i).setSalario_cuenta(saldoCuenta);
-                        exit = "Valor consignado con éxito" +"\nSaldo actual: " +saldoCuenta;
-                    }
+            if(verificarCuenta(numcuenta)){
+                if(cuenta.consignar(saldoConsignar)){
+                    exit= "Valor consignado con exito";
                 }
+                
+            }else{
+                exit= "La cuenta no existe";
             }
             return exit;
         }
@@ -223,7 +223,7 @@ public class Banco {
    * @param saldoRetirar
    * @return 
    */  
-    public boolean retirarSaldo(String numcuenta, double saldoRetirar){
+    private boolean retirarSaldo(String numcuenta, double saldoRetirar){
         double saldoCuenta = 0;
         boolean exit= true;
         if(verificarCuenta(numcuenta)){
@@ -253,7 +253,7 @@ public class Banco {
      * @param numCuentaDestino
      * @param valorTransfer 
      */
-    public void tranferirSueldo(String numCuentaInicio, String numCuentaDestino, double valorTransfer) {        
+    private void tranferirSueldo(String numCuentaInicio, String numCuentaDestino, double valorTransfer) {        
         double saldoCuentaOrigen= 0, nuevoSaldoCuentaOrigen=0;
         double saldoActualCuentaDestino=0, nuevoSaldoCuentaDestino= 0;
         
