@@ -1,6 +1,7 @@
-package aplication;
+package model;
 
 
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -59,7 +60,7 @@ public class Banco {
      * @return
      * @throws Exception 
      */
-    private  String crearCuenta(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) throws Exception {
+    public  String crearCuenta(String nombres, String apellidos, String num_cuenta, String tipo_cuenta, double salario_cuenta) throws Exception {
         
         String salida= "Cuenta creada con exito";
         boolean cuentaEncontrada= verificarCuenta(num_cuenta);
@@ -124,7 +125,10 @@ public class Banco {
                     
                 case 2:
                     String num_Cuenta= Funciones.leerCadena("Ingrese el numero de la cuenta de la cual desea consultar");
-                    consultarCuenta(num_Cuenta);
+                    JOptionPane.showMessageDialog(null,consultarCuenta(num_Cuenta).toString());
+                    if(consultarCuenta(num_Cuenta)== null){
+                        JOptionPane.showMessageDialog(null, "No hay informacion para mostrar");
+                    }
                     break;
                     
                 case 3:
@@ -134,23 +138,19 @@ public class Banco {
                     break;
                     
                 case 4:
-                    String result= "";
                     String numcuenta2 = Funciones.leerCadena("Ingrese el número de la cuenta de la que desea retirar:  ");
                     double valorRetirar = Funciones.leerRealGrande("Ingrese el valor a retirar: ");
-                    boolean cr = retirarSaldo(numcuenta2, valorRetirar);
-                    if(cr){
-                        result= "El retiro ha sido exitoso";
-                    }else{
-                        result= "No se puede retirar una cantidad mayor al saldo disponible";
-                    }
-                    JOptionPane.showMessageDialog(null, result);
+                    String cr = retirarSaldo(numcuenta2, valorRetirar);
+                  
+                    JOptionPane.showMessageDialog(null, cr);
                     break;
                     
                 case 5:
                     String numCuentaInicio= Funciones.leerCadena("Ingrese la cuenta de donde quiere transferir: ");
                     double valorTransfer= Funciones.leerRealGrande("Ingrese el valor que desea transferir: ");
                     String numCuentaDestino= Funciones.leerCadena("Ingrese la cuenta de destino: ");
-                    tranferirSueldo(numCuentaInicio, numCuentaDestino, valorTransfer);
+                    String resultadoTrans= tranferirSueldo(numCuentaInicio, numCuentaDestino, valorTransfer);
+                    JOptionPane.showMessageDialog(null, resultadoTrans);
                     break;
                 
                 case 6: 
@@ -181,19 +181,17 @@ public class Banco {
      * @param num_Cuenta 
      * 
      */
-    private void consultarCuenta(String num_Cuenta) {
-        String salida= "";
+    private Cuenta_banco consultarCuenta(String num_Cuenta) {
         if(!listaCuentas.isEmpty()){
             for (int i = 0; i < listaCuentas.size(); i++) {
                 if(listaCuentas.get(i).verificarNumCuenta(num_Cuenta)){
-                    salida+= listaCuentas.get(i).toString();
+                   return listaCuentas.get(i);
                 }
             }
-          
-        }else{
-            salida= "No hay cuentas para mostar";
         }
-        JOptionPane.showMessageDialog(null, salida);
+        
+           return null;
+        
         
     }
     
@@ -202,18 +200,19 @@ public class Banco {
      * @param numcuenta
      * @param saldoConsignar
      * @return 
+     * @throws Exception
      */
-    private String consignarSaldo(String numcuenta, double saldoConsignar){
+    private String consignarSaldo(String numcuenta, double saldoConsignar) throws Exception{
             Cuenta_banco cuenta  = new Cuenta_banco();
-            
             String exit = "";
-            if(verificarCuenta(numcuenta)){
-                if(cuenta.consignar(saldoConsignar)){
-                    exit= "Valor consignado con exito";
-                }
-                
-            }else{
-                exit= "La cuenta no existe";
+
+            cuenta = consultarCuenta(numcuenta);
+            if(cuenta != null){
+                cuenta.consignar(saldoConsignar);
+                exit= "Consignacion de saldo exitosa su nuevo saldo es: "+cuenta.getSalario_cuenta();
+             }   
+            else{
+                throw new Exception("La cuenta no existe");
             }
             return exit;
         }
@@ -223,25 +222,23 @@ public class Banco {
    * @param saldoRetirar
    * @return 
    */  
-    private boolean retirarSaldo(String numcuenta, double saldoRetirar){
-        double saldoCuenta = 0;
-        boolean exit= true;
-        if(verificarCuenta(numcuenta)){
-            for (int i = 0; i < listaCuentas.size(); i++) {
-                if(listaCuentas.get(i).verificarNumCuenta(numcuenta)){
-                    saldoCuenta = listaCuentas.get(i).getSalario_cuenta();
-                    if(listaCuentas.get(i).verficarSaldo(saldoRetirar)){
-                        exit = false;
-                    }
-                    else{ 
-                        saldoCuenta = saldoCuenta-saldoRetirar;
-                        listaCuentas.get(i).setSalario_cuenta(saldoCuenta);
-                        exit =true;
-                    }
-
-                }
+    private String retirarSaldo(String numcuenta, double saldoRetirar) throws CuentaException{
+        String exit= "true";
+        Cuenta_banco cuenta= new Cuenta_banco();
+        cuenta= consultarCuenta(numcuenta);
+        if(cuenta != null){
+            try {
+                cuenta.retirar(saldoRetirar);
+                exit= "Retiro exitoso su nuevo saldo es de: "+cuenta.getSalario_cuenta() ;
+            } catch (CuentaException cuentaE) {
+                exit= "Excepcion: " + cuentaE.getMessage();
             }
+            
+        }else{
+            throw new CuentaException("No existe una cuenta");
         }
+
+
         return exit;
     }
     /**
@@ -252,42 +249,36 @@ public class Banco {
      * @param numCuentaInicio
      * @param numCuentaDestino
      * @param valorTransfer 
+     * @throws Exception
+     * @throws HeadlessException
      */
-    private void tranferirSueldo(String numCuentaInicio, String numCuentaDestino, double valorTransfer) {        
-        double saldoCuentaOrigen= 0, nuevoSaldoCuentaOrigen=0;
-        double saldoActualCuentaDestino=0, nuevoSaldoCuentaDestino= 0;
+    private String tranferirSueldo(String numCuentaInicio, String numCuentaDestino, double valorTransfer) throws CuentaException{    
+        String exit= "";    
+        Cuenta_banco cuentaI= new Cuenta_banco();
+        Cuenta_banco cuentaF= new Cuenta_banco();
+        cuentaI= consultarCuenta(numCuentaInicio);
+        cuentaF= consultarCuenta(numCuentaDestino);
         
         if(verificarCuenta(numCuentaInicio) && verificarCuenta(numCuentaDestino)){
-            if(numCuentaInicio.equals(numCuentaDestino)){
-                JOptionPane.showMessageDialog(null, "La cuenta de destino no puede ser la misma de origen");
-            }else{
-                if(retirarSaldo(numCuentaInicio,valorTransfer)){
-                    //Se recibe el boolean de la funcion returar saldo, para saber si tiene el saldo disponible
-                    for (int i = 0; i < listaCuentas.size(); i++) {
-                        if(listaCuentas.get(i).verificarNumCuenta(numCuentaDestino)){
-                            saldoActualCuentaDestino= listaCuentas.get(i).getSalario_cuenta();
-                            nuevoSaldoCuentaDestino= saldoActualCuentaDestino+valorTransfer;
-                            
-                            listaCuentas.get(i).setSalario_cuenta(nuevoSaldoCuentaDestino);
-                            JOptionPane.showMessageDialog(null,"Tranferencia exitosa, consulte su nuevo saldo en la opcion 2 del menu principal");
-                            if(listaCuentas.get(i).verificarNumCuenta(numCuentaInicio)){
-                                saldoCuentaOrigen= listaCuentas.get(i).getSalario_cuenta();
-                                nuevoSaldoCuentaOrigen= saldoCuentaOrigen-valorTransfer;
-                                listaCuentas.get(i).setSalario_cuenta(nuevoSaldoCuentaOrigen);
-    
-                            }
-                        }
-                                                    
+            if(cuentaI != null && cuentaF != null){
+                if(!cuentaI.equals(cuentaF)){
+                    try {
+                        cuentaI.retirar(valorTransfer);
+                        cuentaF.consignar(valorTransfer);
+                        exit= "Transferencia exitosa, consulte los nuevos saldos con la opcion 2 del menu";
+                    } catch (CuentaException cuentaE) {
+                        exit= "Excepcion" + cuentaE.getMessage(); 
                     }
                 }else{
-                    JOptionPane.showMessageDialog(null,"No se puede transferir un saldo mayor del que se tiene disponible");
+                    throw new CuentaException("Excepcion: la cuenta de destino no puede ser igual a la original");
                 }
-                        
+            }else{
+                throw new CuentaException("Excepcion: Una de las dos cuentas esta vacia/null");
             }
         }else{
-            JOptionPane.showMessageDialog(null,"Una de las cuentas no existe");
+            throw new CuentaException("Excepcion: Una de las cuentas no esta en la base");
         }
-        
+        return exit;
     }
     
     /**
@@ -298,21 +289,15 @@ public class Banco {
      */
     private boolean compararCuentas(String cuenta1, String cuenta2){
         boolean salida= false;
-        double saldoCuenta1=0, saldoCuenta2=0;
+        Cuenta_banco cuentaI= new Cuenta_banco();
+        Cuenta_banco cuentaII= new Cuenta_banco();
+        cuentaI= consultarCuenta(cuenta1);
+        cuentaII= consultarCuenta(cuenta2);
         
         if (verificarCuenta(cuenta1) && verificarCuenta(cuenta2)  ){
-            for (int i = 0; i < listaCuentas.size(); i++) {
-                if(listaCuentas.get(i).verificarNumCuenta(cuenta1)){
-                    saldoCuenta1= listaCuentas.get(i).getSalario_cuenta();
-                }
-                if(listaCuentas.get(i).verificarNumCuenta(cuenta2)){
-                    saldoCuenta2= listaCuentas.get(i).getSalario_cuenta();
-                }
-            }
-            
-            if(saldoCuenta1>saldoCuenta2){
+           if(cuentaI.getSalario_cuenta()>= cuentaII.getSalario_cuenta()){
                 salida= true;
-            }
+           }
             
             
         }
@@ -320,3 +305,4 @@ public class Banco {
         return salida;
     }
 }
+

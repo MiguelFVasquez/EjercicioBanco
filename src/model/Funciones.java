@@ -1,5 +1,5 @@
 
-package aplication;
+package model;
 
 import javax.swing.JOptionPane;
 

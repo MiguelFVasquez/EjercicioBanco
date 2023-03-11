@@ -1,7 +1,6 @@
-package test;
+package views;
 
-import aplication.Banco;
-
+import model.Banco;
 public class test {
     
     
@@ -9,7 +8,9 @@ public class test {
      
         Banco banco= new Banco("Mi banco","Cra 121212");
         banco.menu();
+    
     }
     
 }
+
 

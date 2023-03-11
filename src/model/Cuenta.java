@@ -1,4 +1,4 @@
-package aplication;
+package model;
 
 /**
  *

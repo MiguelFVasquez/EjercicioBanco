@@ -1,6 +1,5 @@
 
-package aplication;
-
+package model;
 
 public class Cuenta_banco extends Cliente {
     private String num_cuenta;
@@ -26,11 +25,6 @@ public class Cuenta_banco extends Cliente {
         this.salario_cuenta = salario_cuenta;
     }
 
-
-
-    
-    
-    
    public String getNum_cuenta() {
         return num_cuenta;
     }
@@ -71,22 +65,18 @@ public class Cuenta_banco extends Cliente {
     return getSalario_cuenta()<saldoRetiro;
     }
 
-   public boolean retirar(String numCuenta, double saldoRetiro){
-        boolean retiroEfectivo= true;
-        
+   public void retirar(double saldoRetiro)throws CuentaException {
+       
+        if(salario_cuenta >= saldoRetiro){
+            salario_cuenta= salario_cuenta-saldoRetiro;
+        }else{
+            throw new CuentaException("No se puede reirar un saldo mayor que el sueldo disponible");
+        }
 
-
-
-
-        return retiroEfectivo;
    } 
 
-   public boolean consignar( double saldoC){
-        
-        setSalario_cuenta(saldoC+getSalario_cuenta());
-
-        return true;
-
-   }
+   public void consignar( double saldoC){
+        salario_cuenta = salario_cuenta + saldoC;
+    }
 
 }
