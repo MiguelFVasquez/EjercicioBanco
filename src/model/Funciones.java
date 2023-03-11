@@ -4,7 +4,7 @@ package model;
 import javax.swing.JOptionPane;
 
 public class Funciones {
-    static int leerNumero(String msg){
+    public static int leerNumero(String msg){
         int x;
         x= Integer.parseInt(JOptionPane.showInputDialog(msg));
         return x;

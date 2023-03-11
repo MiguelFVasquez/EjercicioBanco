@@ -65,12 +65,12 @@ public class Cuenta_banco extends Cliente {
     return getSalario_cuenta()<saldoRetiro;
     }
 
-   public void retirar(double saldoRetiro)throws CuentaException {
+   public void retirar(double saldoRetiro)throws SaldoException {
        
         if(salario_cuenta >= saldoRetiro){
             salario_cuenta= salario_cuenta-saldoRetiro;
         }else{
-            throw new CuentaException("No se puede reirar un saldo mayor que el sueldo disponible");
+            throw new SaldoException("No se puede reirar un saldo mayor que el sueldo disponible");
         }
 
    } 
